@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Retro Futsal 64-Bit | Fútbol Sala Arcade</title>
+    <meta name="description"
+        content="Juego de fútbol sala 64-bit estilo arcade con cancha ampliada, creador de jugadores para programadores, animaciones fluidas, tutorial interactivo, cartas 60-120 OVR y sistema de monedas.">
+    <!-- Google Fonts: Retro Arcade 64-Bit Pixel & Modern UI Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Outfit:wght@400;600;800;900&family=Fira+Code:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="crt-enabled">
+    <div id="app-container">
+        <!-- CRT Screen Scanline Overlay -->
+        <div class="crt-scanlines"></div>
+
+        <!-- Top Navigation & Header HUD -->
+        <header id="main-header">
+            <div class="header-left">
+                <h1 class="game-logo">⚽ RETRO FUTSAL <span class="pixel-badge-64">64-BIT</span></h1>
+            </div>
+
+            <div class="header-center">
+                <div id="gamepad-status" class="gamepad-badge">⌨️ Teclado / 📱 Táctil</div>
+            </div>
+
+            <div class="header-right">
+                <div id="user-profile-badge" class="user-badge" title="Haz clic para cambiar de usuario">
+                    <span id="user-role-icon">👤</span>
+                    <span id="user-name-display">Invitado</span>
+                    <button id="btn-open-login" class="btn-micro" title="Iniciar Sesión / Cambiar Usuario">🔑</button>
+                </div>
+                <div class="coin-badge" title="Tus Monedas">
+                    <span class="coin-icon">🪙</span>
+                    <span id="user-coins-display">250</span>
+                </div>
+                <button id="btn-toggle-crt" class="icon-btn" title="Alternar efecto CRT Scanline">📺</button>
+                <button id="btn-toggle-sound" class="icon-btn" title="Silenciar / Activar Sonido">🔊</button>
+            </div>
+        </header>
+
+        <!-- Main Navigation Bar -->
+        <!-- Main Navigation Bar -->
+        <nav id="main-nav">
+            <button class="nav-tab active" data-tab="tab-play">🏟️ JUGAR</button>
+            <button class="nav-tab" data-tab="tab-tutorial">🎓 TUTORIAL</button>
+            <button class="nav-tab" data-tab="tab-earn-coins">🪙 GANAR MONEDAS</button>
+            <button class="nav-tab" data-tab="tab-packs">🎴 SOBRES</button>
+            <button class="nav-tab" data-tab="tab-squad">📋 MI PLANTILLA</button>
+            <button class="nav-tab" data-tab="tab-controls">🎮 CONTROLES</button>
+            <button class="nav-tab admin-only-tab hidden" id="nav-tab-admin" data-tab="tab-admin">👑 PANEL ADMIN</button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main id="tab-content-area">
+
+            <!-- TAB 1: PLAY MODES -->
+            <section id="tab-play" class="tab-pane active">
+                <div class="modes-grid">
+                    <!-- Mode 1: VS CPU -->
+                    <div class="mode-card" id="mode-card-cpu">
+                        <div class="mode-icon">🤖</div>
+                        <h3>VERSUS MÁQUINA (IA)</h3>
+                        <p>Enfréntate a la IA en la cancha ampliada 64-bit sin atascos con bots inteligentes.</p>
+
+                        <div class="mode-options">
+                            <label for="select-cpu-difficulty">Dificultad:</label>
+                            <select id="select-cpu-difficulty" class="retro-select">
+                                <option value="easy">Novato (+150 🪙)</option>
+                                <option value="normal" selected>Profesional (+200 🪙)</option>
+                                <option value="hard">Clase Mundial (+260 🪙)</option>
+                                <option value="legend">Leyenda 64 👑 (+350 🪙)</option>
+                            </select>
+                        </div>
+
+                        <div class="mode-options">
+                            <label for="select-cpu-duration">⏱️ Tiempo Real de Juego:</label>
+                            <select id="select-cpu-duration" class="retro-select">
+                                <option value="1">1 Minuto Real (Rápido - 30s/tiempo)</option>
+                                <option value="3" selected>3 Minutos Reales (Estándar - 90s/tiempo)</option>
+                                <option value="5">5 Minutos Reales (Intenso - 150s/tiempo)</option>
+                                <option value="10">10 Minutos Reales (Profesional - 300s/tiempo)</option>
+                            </select>
+                        </div>
+
+                        <button id="btn-start-cpu-match" class="btn-retro-primary">¡JUGAR PARTIDO!</button>
+                    </div>
+
+                    <!-- Mode 2: LOCAL 2 PLAYERS -->
+                    <div class="mode-card" id="mode-card-local">
+                        <div class="mode-icon">👥</div>
+                        <h3>CONTRA AMIGOS (LOCAL 1v1)</h3>
+                        <p>Juega 1vs1 en el mismo teclado compartido o con 2 mandos USB/Bluetooth conectados.</p>
+
+                        <div class="mode-options">
+                            <label for="select-local-duration">⏱️ Tiempo Real de Juego:</label>
+                            <select id="select-local-duration" class="retro-select">
+                                <option value="1">1 Minuto Real (Rápido - 30s/tiempo)</option>
+                                <option value="3" selected>3 Minutos Reales (Estándar - 90s/tiempo)</option>
+                                <option value="5">5 Minutos Reales (Intenso - 150s/tiempo)</option>
+                                <option value="10">10 Minutos Reales (Profesional - 300s/tiempo)</option>
+                            </select>
+                        </div>
+
+                        <div class="local-players-info">
+                            <div><strong>P1:</strong> Teclado o Mando 1 (Personalizable en pestaña Controles)</div>
+                            <div><strong>P2:</strong> Flechas o Mando 2 (Personalizable en pestaña Controles)</div>
+                        </div>
+
+                        <button id="btn-start-local-match" class="btn-retro-primary">¡PARTIDO LOCAL 1VS1!</button>
+                    </div>
+
+                    <!-- Mode 3: QUICK TUTORIAL CARD -->
+                    <div class="mode-card" id="mode-card-tut-quick">
+                        <div class="mode-icon">🎓</div>
+                        <h3>ENTRENAMIENTO GUIADO</h3>
+                        <p>Aprende pases, tiros, barridas y cambio táctico. ¡Gana <strong>+250 🪙</strong> al
+                            completarlo!</p>
+                        <button id="btn-start-tutorial" class="btn-retro-secondary">¡INICIAR TUTORIAL!</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: INTERACTIVE TUTORIAL -->
+            <section id="tab-tutorial" class="tab-pane">
+                <div class="tutorial-container">
+                    <div class="tutorial-header">
+                        <h2>🎓 ACADEMIA DE ENTRENAMIENTO 64-BIT</h2>
+                        <p>Domina todos los conceptos de la cancha ampliada, el juego táctico y las definiciones.</p>
+                    </div>
+
+                    <div class="tutorial-lessons-grid">
+                        <div class="lesson-card">
+                            <div class="lesson-num">1</div>
+                            <h4>Movimiento y Aceleración</h4>
+                            <p>Controla los desplazamientos en 8 direcciones con <strong>WASD / Touch</strong> y mantén
+                                <strong>Sprint</strong> para desmarcarte con velocidad.
+                            </p>
+                        </div>
+                        <div class="lesson-card">
+                            <div class="lesson-num">2</div>
+                            <h4>El Arte del Pase Raso</h4>
+                            <p>Entrega balones a tus compañeros libres con la tecla <strong>[J]</strong> o el botón
+                                <strong>[PASE]</strong> para crear jugadas rápidas.
+                            </p>
+                        </div>
+                        <div class="lesson-card">
+                            <div class="lesson-num">3</div>
+                            <h4>Disparo y Definición</h4>
+                            <p>Apunta hacia los postes o escuadras con la tecla <strong>[K]</strong> o
+                                <strong>[TIRO]</strong> para batir al arquero rival.
+                            </p>
+                        </div>
+                        <div class="lesson-card">
+                            <div class="lesson-num">4</div>
+                            <h4>Barridas y Robos Limpios</h4>
+                            <p>Recupera la posesión barriéndote con <strong>[U]</strong> o <strong>[ROBO]</strong>.
+                                ¡Cuidado con no entrar por detrás para evitar tarjetas!</p>
+                        </div>
+                        <div class="lesson-card">
+                            <div class="lesson-num">5</div>
+                            <h4>Cambio Táctico</h4>
+                            <p>Pulsa <strong>[ESPACIO]</strong> o <strong>[CAMBIO]</strong> para seleccionar al jugador
+                                mejor posicionado en cada jugada.</p>
+                        </div>
+                    </div>
+
+                    <div class="tutorial-action-box">
+                        <div class="tutorial-reward-badge">Recompensa: +250 🪙 Monedas de Oro</div>
+                        <button onclick="document.getElementById('btn-start-tutorial').click()"
+                            class="btn-retro-primary">¡COMENZAR ENTRENAMIENTO EN VIVO!</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: HOW TO EARN COINS -->
+            <section id="tab-earn-coins" class="tab-pane">
+                <div class="earn-coins-container">
+                    <div class="earn-header">
+                        <h2>🪙 GUÍA DEL SISTEMA DE MONEDAS (COINS)</h2>
+                        <p>Gana monedas jugando partidos, marcando goles y superando desafíos para desbloquear los
+                            mejores sobres.</p>
+                    </div>
+
+                    <div id="earn-coins-guide-list" class="earn-grid"></div>
+                </div>
+            </section>
+
+            <!-- TAB 5: PACK OPENING STORE -->
+            <section id="tab-packs" class="tab-pane">
+                <div class="packs-container">
+                    <div class="packs-header">
+                        <h2>TIENDA DE SOBRES FUTSAL 64-BIT</h2>
+                        <p>Abre sobres para conseguir jugadores con estadísticas de <strong>60 a 120</strong>.</p>
+                    </div>
+
+                    <div class="packs-grid">
+                        <!-- Pack 1: Standard Bronze -->
+                        <div class="pack-item pack-bronze">
+                            <div class="pack-art">🥉</div>
+                            <h3>SOBRE ESTÁNDAR</h3>
+                            <p>Contiene 3 jugadores (65 a 88 OVR).</p>
+                            <div class="pack-price">100 🪙</div>
+                            <button class="btn-retro-primary btn-buy-pack" data-pack-type="standard"
+                                data-cost="100">ABRIR (100 🪙)</button>
+                        </div>
+
+                        <!-- Pack 2: Premium Gold -->
+                        <div class="pack-item pack-gold">
+                            <div class="pack-art">🥇</div>
+                            <h3>SOBRE ORO PREMIUM</h3>
+                            <p>Contiene 3 jugadores Oro con posibilidad de Leyendas (85 a 120 OVR).</p>
+                            <div class="pack-price">250 🪙</div>
+                            <button class="btn-retro-primary btn-buy-pack" data-pack-type="premium"
+                                data-cost="250">ABRIR (250 🪙)</button>
+                        </div>
+
+                        <!-- Pack 3: Icon Legends 64 -->
+                        <div class="pack-item pack-icon">
+                            <div class="pack-art">👑</div>
+                            <h3>SOBRE LEYENDAS 64-BIT</h3>
+                            <p>Garantiza astros mundiales (Falcão 12, Ricardinho, Ronaldinho, Maradona: 100 - 120 OVR).
+                            </p>
+                            <div class="pack-price">500 🪙</div>
+                            <button class="btn-retro-primary btn-buy-pack" data-pack-type="legend" data-cost="500">ABRIR
+                                (500 🪙)</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 6: SQUAD BUILDER -->
+            <section id="tab-squad" class="tab-pane">
+                <div class="squad-builder-container">
+                    <div class="squad-header">
+                        <h2>📋 MI PLANTILLA TITULAR (5v5)</h2>
+                        <div class="team-rating-badge">
+                            <span>MEDIA DEL EQUIPO:</span>
+                            <strong id="team-rating-display">85</strong>
+                        </div>
+                    </div>
+
+                    <!-- Active 5 Players Grid -->
+                    <div id="active-squad-grid" class="squad-pitch-view"></div>
+
+                    <!-- Inventory Cards Grid -->
+                    <div class="inventory-section">
+                        <h3>📦 CARTAS EN EL BANQUILLO / INVENTARIO</h3>
+                        <p class="hint-text">Haz clic en cualquier carta de tu inventario para asignarla a tu 5 titular.
+                        </p>
+                        <div id="inventory-cards-grid" class="cards-grid"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 7: CONTROLS & MANUAL (PERSONALIZACIÓN Y RECONOCIMIENTO BLUETOOTH) -->
+            <section id="tab-controls" class="tab-pane">
+                <div class="controls-guide-container">
+                    <div class="controls-header-bar">
+                        <div>
+                            <h2>🎮 CONFIGURACIÓN DE CONTROLES Y MANDOS BLUETOOTH</h2>
+                            <p class="controls-subtitle">Haz clic en cualquier acción para reasignar la tecla. Compatible con Teclados, Mandos Bluetooth (Xbox, PS4/PS5, Genéricos) y Pantallas Táctiles.</p>
+                        </div>
+                        <div class="controls-top-actions">
+                            <button id="btn-reset-controls" class="btn-retro-secondary">🔄 RESTABLECER POR DEFECTO</button>
+                        </div>
+                    </div>
+
+                    <div id="controls-save-toast" class="controls-save-toast hidden">
+                        ✅ ¡Tecla reasignada y guardada con éxito!
+                    </div>
+
+                    <!-- Dual Player Remapping Grid -->
+                    <div class="controls-rebind-grid">
+                        <!-- Columna Jugador 1 -->
+                        <div class="control-card rebind-card">
+                            <div class="card-header-with-badge">
+                                <h3>⌨️ / 🎮 JUGADOR 1 (PRINCIPAL)</h3>
+                                <span class="badge-player p1-badge">P1</span>
+                            </div>
+                            <p class="card-hint-text">Controles activos en modo 1 Jugador (VS Máquina) y P1 en Local.</p>
+                            
+                            <div class="bind-list">
+                                <div class="bind-row">
+                                    <span class="bind-label">⬆️ Mover Arriba:</span>
+                                    <button class="btn-keybind" data-player="p1" data-action="up" id="bind-p1-up">W</button>
+                                </div>
+                                <div class="bind-row">
+                                    <span class="bind-label">⬇️ Mover Abajo:</span>
+                                    <button class="btn-keybind" data-player="p1" data-action="down" id="bind-p1-down">S</button>
+                                </div>
+                                <div class="bind-row">
+                                    <span class="bind-label">⬅️ Mover Izquierda:</span>
+                                    <button class="btn-keybind" data-player="p1" data-action="left" id="bind-p1-left">A</button>
+                                </div>
+                                <div class="bind-row">
+                                    <span class="bind-label">➡️ Mover Derecha:</span>
+                                    <button class="btn-keybind" data-player="p1" data-action="right" id="bind-p1-right">D</button>
+                                </div>
+                                <div class="bind-row">
+                                    <span class="bind-label">🅰️ Pase Raso:</span>
+                                    <button class="btn-keybind" data-player="p1" data-action="pass" id="bind-p1-pass">J</button>
+                                </div>
+                                <div class="bind-row">
+                                    <span class="bind-label">⚽ Disparo a Puerta:</span>
+                                    <button class="btn-keybind" data-player="p1" data-action="shoot" id="bind-p1-shoot">K</button>
+                                </div>
+                                <div class="bind-row">
+                                    <span class="bind-label">🛡️ Barrida / Robo:</span>
+                                    <button class="btn-keybind" data-player="p1" data-action="tackle" id="bind-p1-tackle">U</button>
+                                </div>
+                                <div class="bind-row">
+                                    <span class="bind-label">⚡ Sprint / Turbo:</span>
+                                    <button class="btn-keybind" data-player="p1" data-action="sprint" id="bind-p1-sprint">L</button>
+                                </div>
+                                <div class="bind-row">
+                                    <span class="bind-label">🔄 Cambiar Jugador:</span>
+                                    <button class="btn-keybind" data-player="p1" data-action="switchPlayer" id="bind-p1-switchPlayer">Espacio</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Columna Jugador 2 -->
+                        <div class="control-card rebind-card">
+                            <div class="card-header-with-badge">
+                                <h3>⌨️ / 🎮 JUGADOR 2 (LOCAL 1v1)</h3>
+                                <span class="badge-player p2-badge">P2</span>
+                            </div>
+                            <p class="card-hint-text">Controles para tu oponente en el mismo teclado o con segundo mando.</p>
+
+                            <div class="bind-list">
+                                <div class="bind-row">
+                                    <span class="bind-label">⬆️ Mover Arriba:</span>
+                                    <button class="btn-keybind" data-player="p2" data-action="up" id="bind-p2-up">↑</button>
+                                </div>
+                                <div class="bind-row">
+                                    <span class="bind-label">⬇️ Mover Abajo:</span>
+                                    <button class="btn-keybind" data-player="p2" data-action="down" id="bind-p2-down">↓</button>
+                                </div>
+                                <div class="bind-row">
+                                    <span class="bind-label">⬅️ Mover Izquierda:</span>
+                                    <button class="btn-keybind" data-player="p2" data-action="left" id="bind-p2-left">←</button>
+                                </div>
+                                <div class="bind-row">
+                                    <span class="bind-label">➡️ Mover Derecha:</span>
+                                    <button class="btn-keybind" data-player="p2" data-action="right" id="bind-p2-right">→</button>
+                                </div>
+                                <div class="bind-row">
+                                    <span class="bind-label">🅰️ Pase Raso:</span>
+                                    <button class="btn-keybind" data-player="p2" data-action="pass" id="bind-p2-pass">Num 1</button>
+                                </div>
+                                <div class="bind-row">
+                                    <span class="bind-label">⚽ Disparo a Puerta:</span>
+                                    <button class="btn-keybind" data-player="p2" data-action="shoot" id="bind-p2-shoot">Num 2</button>
+                                </div>
+                                <div class="bind-row">
+                                    <span class="bind-label">🛡️ Barrida / Robo:</span>
+                                    <button class="btn-keybind" data-player="p2" data-action="tackle" id="bind-p2-tackle">Num 5</button>
+                                </div>
+                                <div class="bind-row">
+                                    <span class="bind-label">⚡ Sprint / Turbo:</span>
+                                    <button class="btn-keybind" data-player="p2" data-action="sprint" id="bind-p2-sprint">Num 3</button>
+                                </div>
+                                <div class="bind-row">
+                                    <span class="bind-label">🔄 Cambiar Jugador:</span>
+                                    <button class="btn-keybind" data-player="p2" data-action="switchPlayer" id="bind-p2-switchPlayer">Num 0</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Panel de Asignación de Mandos por Jugador -->
+                    <div class="control-card gamepad-assign-card">
+                        <div class="gamepad-card-header">
+                            <div class="gamepad-card-title">
+                                <h3>🕹️ ASIGNACIÓN DE MANDOS POR JUGADOR (LOCAL)</h3>
+                                <p>Elige si cada jugador usa teclado, mando o ambos. Asigna qué mando controla cada jugador.</p>
+                            </div>
+                            <div id="gp-connected-count" class="status-pill status-connected">
+                                0 mando(s) detectado(s)
+                            </div>
+                        </div>
+
+                        <div class="gp-assign-grid">
+                            <!-- P1 Asignación -->
+                            <div class="gp-assign-block gp-assign-p1">
+                                <div class="gp-assign-header">
+                                    <span class="badge-player p1-badge">P1</span>
+                                    <h4>Jugador 1</h4>
+                                </div>
+                                <div class="gp-assign-row">
+                                    <label for="gp-input-mode-p1">Modo de entrada:</label>
+                                    <select id="gp-input-mode-p1" class="retro-select">
+                                        <option value="both" selected>⌨️🎮 Teclado + Mando</option>
+                                        <option value="keyboard">⌨️ Solo Teclado</option>
+                                        <option value="gamepad">🎮 Solo Mando</option>
+                                    </select>
+                                </div>
+                                <div class="gp-assign-row">
+                                    <label for="gp-index-p1">Mando asignado:</label>
+                                    <select id="gp-index-p1" class="retro-select">
+                                        <option value="0">Sin mandos conectados</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- P2 Asignación -->
+                            <div class="gp-assign-block gp-assign-p2">
+                                <div class="gp-assign-header">
+                                    <span class="badge-player p2-badge">P2</span>
+                                    <h4>Jugador 2</h4>
+                                </div>
+                                <div class="gp-assign-row">
+                                    <label for="gp-input-mode-p2">Modo de entrada:</label>
+                                    <select id="gp-input-mode-p2" class="retro-select">
+                                        <option value="both" selected>⌨️🎮 Teclado + Mando</option>
+                                        <option value="keyboard">⌨️ Solo Teclado</option>
+                                        <option value="gamepad">🎮 Solo Mando</option>
+                                    </select>
+                                </div>
+                                <div class="gp-assign-row">
+                                    <label for="gp-index-p2">Mando asignado:</label>
+                                    <select id="gp-index-p2" class="retro-select">
+                                        <option value="1">Sin mandos conectados</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="gp-tip-box">
+                            <strong>💡 TIP:</strong> Conecta tus mandos Bluetooth/USB y presiona cualquier botón para que el navegador los detecte. Luego asigna cada mando al jugador correspondiente.
+                        </div>
+                    </div>
+
+                    <!-- Tip: Jugar con el Portero -->
+                    <div class="control-card goalkeeper-tip-card">
+                        <h3>🧤 ¡PUEDES JUGAR CON EL PORTERO!</h3>
+                        <p>Usa el botón <strong>Cambiar Jugador</strong> (Espacio / LB / L1) para ciclar entre <strong>todos</strong> los jugadores de tu equipo, <strong>incluyendo el arquero</strong>. Controla al portero manualmente para hacer atajadas épicas.</p>
+                    </div>
+
+                    <!-- Panel de Reconocimiento de Mandos Bluetooth & USB -->
+                    <div class="control-card gamepad-live-card">
+                        <div class="gamepad-card-header">
+                            <div class="gamepad-card-title">
+                                <h3>📶 RECONOCIMIENTO DE MANDOS BLUETOOTH / USB</h3>
+                                <p>Soporte automático Plug & Play: Mandos de Xbox Wireless, PlayStation (DualShock / DualSense), 8BitDo y mandos Bluetooth genéricos.</p>
+                            </div>
+                            <div id="gamepad-live-status-pill" class="status-pill status-disconnected">
+                                🔴 Sin mandos detectados
+                            </div>
+                        </div>
+
+                        <div class="gamepad-info-box">
+                            <div class="gamepad-name-row">
+                                <span>Dispositivo Actual:</span>
+                                <strong id="gamepad-connected-name">Ningún mando activo (Presiona cualquier botón en tu mando para vincularlo al juego)</strong>
+                            </div>
+                        </div>
+
+                        <!-- Monitor Visual en Tiempo Real de Botones Gamepad -->
+                        <div class="gamepad-visual-tester">
+                            <div class="tester-title">PROBADOR DE BOTONES EN VIVO (BLUETOOTH / USB):</div>
+                            <div class="tester-buttons-row">
+                                <div class="gp-test-btn" id="gp-btn-0" title="Botón A / Cruz">A (Pase)</div>
+                                <div class="gp-test-btn" id="gp-btn-1" title="Botón B / Círculo">B (Barrida)</div>
+                                <div class="gp-test-btn" id="gp-btn-2" title="Botón X / Cuadrado">X (Tiro)</div>
+                                <div class="gp-test-btn" id="gp-btn-3" title="Botón Y / Triángulo">Y (Tiro)</div>
+                                <div class="gp-test-btn" id="gp-btn-4" title="LB / L1">LB (Cambio)</div>
+                                <div class="gp-test-btn" id="gp-btn-5" title="RB / R1">RB (Sprint)</div>
+                                <div class="gp-test-btn" id="gp-btn-6" title="LT / L2">LT (Cambio)</div>
+                                <div class="gp-test-btn" id="gp-btn-7" title="RT / R2">RT (Sprint)</div>
+                                <div class="gp-test-btn" id="gp-btn-9" title="Start / Options">START (Pausa)</div>
+                            </div>
+                            <div class="tester-dpad-row">
+                                <span class="dpad-title">D-Pad / Stick:</span>
+                                <div class="gp-test-dir" id="gp-dir-up">▲ Arriba</div>
+                                <div class="gp-test-dir" id="gp-dir-down">▼ Abajo</div>
+                                <div class="gp-test-dir" id="gp-dir-left">◄ Izquierda</div>
+                                <div class="gp-test-dir" id="gp-dir-right">► Derecha</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: ADMIN PANEL (SOLO ACCESIBLE CON +-+-ALEX) -->
+            <section id="tab-admin" class="tab-pane">
+                <div class="admin-container">
+                    <div class="admin-header">
+                        <div class="admin-title-row">
+                            <h2>👑 PANEL DE ADMINISTRACIÓN (YO)</h2>
+                            <span class="admin-security-badge">Nivel de Acceso: SUPERADMIN (+-+-ALEX)</span>
+                        </div>
+                        <p>Control total sobre la base de datos de jugadores, estadísticas OVR 60-120, economía de sobres y monitoreo de usuarios.</p>
+                    </div>
+
+                    <div class="admin-grid">
+                        <!-- Panel 1: AGREGAR NUEVO JUGADOR -->
+                        <div class="admin-card">
+                            <h3>➕ AGREGAR NUEVO JUGADOR</h3>
+                            <form id="form-admin-add-player" class="admin-form">
+                                <div class="form-row">
+                                    <label>Nombre:</label>
+                                    <input type="text" id="admin-add-name" required placeholder="Ej. Alex Crack" maxlength="24">
+                                </div>
+                                <div class="form-row-2">
+                                    <div>
+                                        <label>Posición:</label>
+                                        <select id="admin-add-pos" class="retro-select">
+                                            <option value="POR">Portero (POR)</option>
+                                            <option value="DEF">Defensa (DEF)</option>
+                                            <option value="MC">Medio Centro (MC)</option>
+                                            <option value="DEL" selected>Delantero (DEL)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label>País / Selección:</label>
+                                        <select id="admin-add-nation" class="retro-select">
+                                            <option value="BR">🇧🇷 Brasil</option>
+                                            <option value="ES" selected>🇪🇸 España</option>
+                                            <option value="AR">🇦🇷 Argentina</option>
+                                            <option value="PT">🇵🇹 Portugal</option>
+                                            <option value="FR">🇫🇷 Francia</option>
+                                            <option value="IT">🇮🇹 Italia</option>
+                                            <option value="JP">🇯🇵 Japón</option>
+                                            <option value="CO">🇨🇴 Colombia</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row-2">
+                                    <div>
+                                        <label>Media Global (OVR 60-120):</label>
+                                        <input type="number" id="admin-add-ovr" min="60" max="120" value="115">
+                                    </div>
+                                    <div>
+                                        <label>Categoría (Rareza):</label>
+                                        <select id="admin-add-rarity" class="retro-select">
+                                            <option value="bronze">Bronce (60-74)</option>
+                                            <option value="silver">Plata (75-84)</option>
+                                            <option value="gold">Oro (85-99)</option>
+                                            <option value="icon" selected>Leyenda 64-Bit (100-120)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="admin-stats-inputs">
+                                    <div><label>VEL:</label><input type="number" id="admin-add-vel" min="60" max="120" value="118"></div>
+                                    <div><label>TIR:</label><input type="number" id="admin-add-tir" min="60" max="120" value="116"></div>
+                                    <div><label>PAS:</label><input type="number" id="admin-add-pas" min="60" max="120" value="112"></div>
+                                    <div><label>REG:</label><input type="number" id="admin-add-reg" min="60" max="120" value="120"></div>
+                                    <div><label>DEF:</label><input type="number" id="admin-add-def" min="60" max="120" value="78"></div>
+                                    <div><label>FIS:</label><input type="number" id="admin-add-fis" min="60" max="120" value="98"></div>
+                                </div>
+
+                                <div class="form-row">
+                                    <label>Jugada / Tiro Especial:</label>
+                                    <input type="text" id="admin-add-special" value="Cañonazo 64-Bit">
+                                </div>
+
+                                <button type="submit" class="btn-retro-primary">¡GUARDAR Y AGREGAR AL JUEGO!</button>
+                            </form>
+                        </div>
+
+                        <!-- Panel 2: MODIFICAR JUGADOR EXISTENTE -->
+                        <div class="admin-card">
+                            <h3>✏️ MODIFICAR JUGADOR EXISTENTE</h3>
+                            <form id="form-admin-edit-player" class="admin-form">
+                                <div class="form-row">
+                                    <label>Seleccionar Jugador:</label>
+                                    <select id="admin-select-player-edit" class="retro-select"></select>
+                                </div>
+                                <div class="form-row">
+                                    <label>Nombre del Jugador:</label>
+                                    <input type="text" id="admin-edit-name" required>
+                                </div>
+                                <div class="form-row-2">
+                                    <div>
+                                        <label>Media (OVR):</label>
+                                        <input type="number" id="admin-edit-ovr" min="60" max="120">
+                                    </div>
+                                    <div>
+                                        <label>Rareza:</label>
+                                        <select id="admin-edit-rarity" class="retro-select">
+                                            <option value="bronze">Bronce</option>
+                                            <option value="silver">Plata</option>
+                                            <option value="gold">Oro</option>
+                                            <option value="icon">Leyenda 64-Bit</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="admin-stats-inputs">
+                                    <div><label>VEL:</label><input type="number" id="admin-edit-vel" min="60" max="120"></div>
+                                    <div><label>TIR:</label><input type="number" id="admin-edit-tir" min="60" max="120"></div>
+                                    <div><label>PAS:</label><input type="number" id="admin-edit-pas" min="60" max="120"></div>
+                                    <div><label>REG:</label><input type="number" id="admin-edit-reg" min="60" max="120"></div>
+                                    <div><label>DEF:</label><input type="number" id="admin-edit-def" min="60" max="120"></div>
+                                    <div><label>FIS:</label><input type="number" id="admin-edit-fis" min="60" max="120"></div>
+                                </div>
+                                <button type="submit" class="btn-retro-primary">GUARDAR CAMBIOS DEL JUGADOR</button>
+                            </form>
+                        </div>
+
+                        <!-- Panel 3: ECONOMÍA Y PRECIOS DE TIENDA -->
+                        <div class="admin-card">
+                            <h3>🪙 PRECIOS DE SOBRES Y RECURSOS</h3>
+                            <div class="admin-form">
+                                <div class="form-row-3">
+                                    <div>
+                                        <label>Sobre Bronce (🪙):</label>
+                                        <input type="number" id="admin-price-standard" min="10" max="5000" value="100">
+                                    </div>
+                                    <div>
+                                        <label>Sobre Oro (🪙):</label>
+                                        <input type="number" id="admin-price-premium" min="10" max="5000" value="250">
+                                    </div>
+                                    <div>
+                                        <label>Sobre Leyenda (🪙):</label>
+                                        <input type="number" id="admin-price-legend" min="10" max="5000" value="500">
+                                    </div>
+                                </div>
+                                <button id="btn-admin-save-prices" class="btn-retro-primary">ACTUALIZAR PRECIOS EN TIENDA</button>
+
+                                <div class="admin-coins-grant-box">
+                                    <h4>🎁 Fondos de Administrador:</h4>
+                                    <button id="btn-admin-grant-coins" class="btn-retro-secondary">¡DARME +2,000 🪙 MONEDAS!</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Panel 4: MONITOREO Y BANEO DE USUARIOS -->
+                        <div class="admin-card admin-card-full">
+                            <h3>🛡️ MONITOREO Y BANEO DE USUARIOS EN LÍNEA</h3>
+                            <p class="admin-subtext">Visualiza las sesiones activas, banea usuarios infractores o expúlsalos en tiempo real.</p>
+                            
+                            <div class="admin-table-wrapper">
+                                <table class="admin-table" id="admin-users-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Usuario</th>
+                                            <th>IP Simulada</th>
+                                            <th>Ping</th>
+                                            <th>Partidos</th>
+                                            <th>Estado</th>
+                                            <th>Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="admin-users-table-body">
+                                        <!-- Rellenado dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- MATCH STAGE (CANVAS & HUD) -->
+        <div id="match-stage" class="hidden">
+            <!-- Top Match Scoreboard -->
+            <div id="scoreboard-hud">
+                <div class="team-score-block team-home">
+                    <span id="hud-team1-name" class="team-name">MI CLUB</span>
+                    <span id="hud-score-1" class="team-score">0</span>
+                    <span id="hud-fouls-1" class="fouls-counter">Faltas: 0/5</span>
+                </div>
+
+                <div class="match-timer-block">
+                    <div id="hud-match-timer">00:00</div>
+                    <button id="btn-toggle-fullscreen" class="btn-fullscreen-hud" title="Ajustar a Pantalla Completa">⛶ PANTALLA COMPLETA</button>
+                    <button id="btn-pause-match" class="btn-pause-icon">⏸️ PAUSA</button>
+                </div>
+
+                <div class="team-score-block team-away">
+                    <span id="hud-score-2" class="team-score">0</span>
+                    <span id="hud-team2-name" class="team-name">RIVAL</span>
+                    <span id="hud-fouls-2" class="fouls-counter">Faltas: 0/5</span>
+                </div>
+            </div>
+
+            <!-- Canvas Container (1050x620) -->
+            <div id="canvas-wrapper">
+                <canvas id="futsal-canvas" width="1050" height="620"></canvas>
+
+                <!-- Mobile Virtual Touch Controls Overlay -->
+                <div id="touch-controls-overlay">
+                    <div class="touch-joystick-zone">
+                        <div id="touch-joystick-base">
+                            <div id="touch-joystick-thumb"></div>
+                        </div>
+                    </div>
+
+                    <div class="touch-action-zone">
+                        <button id="btn-touch-switch" class="touch-btn touch-btn-switch">🔄 CAMBIO</button>
+                        <button id="btn-touch-sprint" class="touch-btn touch-btn-sprint">⚡ SPRINT</button>
+                        <div class="touch-main-buttons">
+                            <button id="btn-touch-pass" class="touch-btn touch-btn-pass">🅰️ PASE</button>
+                            <button id="btn-touch-shoot" class="touch-btn touch-btn-shoot">⚽ TIRO</button>
+                            <button id="btn-touch-tackle" class="touch-btn touch-btn-tackle">🛡️ ROBO</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PACK OPENING REVEAL MODAL -->
+        <div id="pack-opening-modal" class="modal-overlay hidden">
+            <div class="pack-reveal-card">
+                <h2>🎴 ¡NUEVAS CARTAS DESBLOQUEADAS!</h2>
+                <div id="pack-cards-reveal" class="cards-reveal-grid"></div>
+                <button id="btn-close-pack-modal" class="btn-retro-primary">¡GUARDAR EN MI CLUB!</button>
+            </div>
+        </div>
+
+        <!-- HALFTIME MODAL -->
+        <div id="halftime-modal" class="modal-overlay hidden">
+            <div class="match-summary-card">
+                <h2>⏸️ DESCANSO (FIN DEL 1ER TIEMPO)</h2>
+                <div class="summary-score-line">
+                    <span id="ht-score-1">0</span> - <span id="ht-score-2">0</span>
+                </div>
+                <div class="stats-summary-table">
+                    <div class="stat-row"><span>Posesión:</span> <span id="ht-possession">50% - 50%</span></div>
+                    <div class="stat-row"><span>Tiros a Puerta:</span> <span id="ht-shots">0 - 0</span></div>
+                    <div class="stat-row"><span>Faltas Acumuladas:</span> <span id="ht-fouls">0 - 0</span></div>
+                </div>
+                <button id="btn-continue-second-half" class="btn-retro-primary">CONTINUAR 2º TIEMPO</button>
+            </div>
+        </div>
+
+        <!-- FULLTIME / MATCH END MODAL -->
+        <div id="fulltime-modal" class="modal-overlay hidden">
+            <div class="match-summary-card">
+                <h2 id="ft-title">🏆 ¡FINAL DEL PARTIDO!</h2>
+                <div class="summary-score-line">
+                    <span id="ft-score-1">0</span> - <span id="ft-score-2">0</span>
+                </div>
+                <div class="ft-reward-box">
+                    <span>Recompensa de Monedas:</span>
+                    <strong id="ft-reward-coins">+200 🪙</strong>
+                </div>
+                <div class="stats-summary-table">
+                    <div class="stat-row"><span>Posesión:</span> <span id="ft-possession">50% - 50%</span></div>
+                    <div class="stat-row"><span>Tiros a Puerta:</span> <span id="ft-shots">0 - 0</span></div>
+                    <div class="stat-row"><span>Faltas:</span> <span id="ft-fouls">0 - 0</span></div>
+                </div>
+                <button id="btn-back-to-menu" class="btn-retro-primary">VOLVER AL MENÚ PRINCIPAL</button>
+            </div>
+        </div>
+
+        <!-- PAUSE MODAL -->
+        <div id="pause-modal" class="modal-overlay hidden">
+            <div class="pause-menu-card">
+                <h2>⏸️ PARTIDO EN PAUSA</h2>
+                <p class="pause-subtitle">El cronómetro y el juego están congelados</p>
+                <div class="pause-actions-list">
+                    <button id="btn-resume-match" class="btn-retro-primary btn-large">▶️ REANUDAR PARTIDO</button>
+                    <button id="btn-restart-match" class="btn-retro-secondary btn-large">🔄 REINICIAR PARTIDO</button>
+                    <button id="btn-exit-to-menu" class="btn-retro-danger btn-large">🚪 SALIR AL MENÚ PRINCIPAL</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOGIN / AUTHENTICATION MODAL -->
+        <div id="login-modal" class="modal-overlay hidden">
+            <div class="login-card">
+                <h2>🔑 INICIAR SESIÓN / ACCESO</h2>
+                <p class="login-subtitle">Ingresa tu nombre para guardar tus estadísticas y progresos del club.</p>
+                <form id="form-login">
+                    <div class="form-row">
+                        <label for="login-username">Nombre de Usuario o Comando:</label>
+                        <input type="text" id="login-username" placeholder="Tu nombre o código de Admin" maxlength="25" autocomplete="off" required>
+                    </div>
+                    <div class="login-admin-hint">
+                        👑 <strong>Acceso Administrador:</strong> Ingresa el comando exacto <code class="secret-code">+-+-ALEX</code> para activar el rol Administrador con control total.
+                    </div>
+                    <div class="login-actions">
+                        <button type="submit" class="btn-retro-primary">ENTRAR</button>
+                        <button type="button" id="btn-cancel-login" class="btn-retro-secondary">CANCELAR</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- USER SUSPENDED / BANNED MODAL -->
+        <div id="banned-modal" class="modal-overlay hidden">
+            <div class="banned-card">
+                <h2>🚫 ACCESO SUSPENDIDO</h2>
+                <p>Tu cuenta ha sido <strong>BANEADA</strong> por el Administrador del servidor.</p>
+                <p class="banned-reason">No tienes permitido disputar partidos ni torneos mientras dure la sanción.</p>
+                <button id="btn-banned-logout" class="btn-retro-danger">CAMBIAR DE CUENTA</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 1. Configuración y Catálogo de Jugadores en Código (¡Modifica aquí jugadores, nombres y stats!) -->
+    <script src="players_config.js"></script>
+
+    <!-- 2. Motor de Juego Retro Futsal 64-Bit (100% Compatible sin servidor y con file:///) -->
+    <script src="app.js"></script>
+</body>
+
+</html>

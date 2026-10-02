@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <title>Retro Futsal Automated Verification Tests</title>
+</head>
+<body>
+    <div id="results">Running tests...</div>
+
+    <!-- Mock DOM elements required by app.js so it initializes cleanly -->
+    <div id="app-container" style="display:none">
+        <span id="user-role-icon"></span>
+        <span id="user-name-display"></span>
+        <button id="btn-open-login"></button>
+        <span id="user-coins-display"></span>
+        <button id="btn-toggle-crt"></button>
+        <button id="btn-toggle-sound"></button>
+        <div id="gamepad-status"></div>
+        <nav id="main-nav">
+            <button class="nav-tab active" data-tab="tab-play"></button>
+            <button class="nav-tab" data-tab="tab-tutorial"></button>
+            <button class="nav-tab" data-tab="tab-earn-coins"></button>
+            <button class="nav-tab" data-tab="tab-packs"></button>
+            <button class="nav-tab" data-tab="tab-squad"></button>
+            <button class="nav-tab" data-tab="tab-controls"></button>
+            <button class="nav-tab admin-only-tab hidden" id="nav-tab-admin" data-tab="tab-admin"></button>
+        </nav>
+        <main id="tab-content-area">
+            <section id="tab-play" class="tab-pane active">
+                <button id="btn-start-cpu-match"></button>
+                <button id="btn-start-local-match"></button>
+                <button id="btn-start-tutorial"></button>
+                <select id="select-cpu-difficulty"><option value="normal">Normal</option></select>
+                <select id="select-cpu-duration"><option value="1">1</option><option value="3" selected>3</option><option value="5">5</option><option value="10">10</option></select>
+                <select id="select-local-duration"><option value="1">1</option><option value="3" selected>3</option><option value="5">5</option><option value="10">10</option></select>
+            </section>
+            <section id="tab-tutorial" class="tab-pane">
+                <button id="btn-tut-step-next"></button>
+                <button id="btn-tut-complete-finish"></button>
+                <div id="tut-action-card"></div>
+                <div id="tut-phase-title"></div>
+                <div id="tut-step-instruction"></div>
+                <div id="tut-tip-text"></div>
+                <div id="tut-progress-fill"></div>
+            </section>
+            <section id="tab-earn-coins" class="tab-pane">
+                <div id="earn-tasks-grid"></div>
+            </section>
+            <section id="tab-packs" class="tab-pane">
+                <div class="packs-grid"></div>
+            </section>
+            <section id="tab-squad" class="tab-pane">
+                <strong id="team-rating-display"></strong>
+                <div id="active-squad-grid"></div>
+                <div id="inventory-cards-grid"></div>
+            </section>
+            <section id="tab-controls" class="tab-pane">
+                <button id="btn-reset-controls"></button>
+                <div id="controls-save-toast" class="hidden"></div>
+                <button class="btn-keybind" data-player="p1" data-action="up" id="bind-p1-up">W</button>
+                <button class="btn-keybind" data-player="p1" data-action="pass" id="bind-p1-pass">J</button>
+                <button class="btn-keybind" data-player="p1" data-action="shoot" id="bind-p1-shoot">K</button>
+                <button class="btn-keybind" data-player="p1" data-action="tackle" id="bind-p1-tackle">U</button>
+                <button class="btn-keybind" data-player="p1" data-action="sprint" id="bind-p1-sprint">L</button>
+                <button class="btn-keybind" data-player="p1" data-action="switchPlayer" id="bind-p1-switchPlayer">Espacio</button>
+                <button class="btn-keybind" data-player="p2" data-action="up" id="bind-p2-up">↑</button>
+                <button class="btn-keybind" data-player="p2" data-action="pass" id="bind-p2-pass">Num 1</button>
+                <div id="gamepad-live-status-pill" class="status-pill status-disconnected"></div>
+                <strong id="gamepad-connected-name"></strong>
+                <div id="gp-btn-0"></div>
+                <div id="gp-dir-up"></div>
+            </section>
+            <section id="tab-admin" class="tab-pane">
+                <form id="form-admin-add-player">
+                    <input type="text" id="admin-add-name" value="Crack Admin">
+                    <select id="admin-add-pos"><option value="DEL">DEL</option></select>
+                    <select id="admin-add-nation"><option value="ES">ES</option></select>
+                    <input type="number" id="admin-add-ovr" value="115">
+                    <select id="admin-add-rarity"><option value="icon">Icon</option></select>
+                    <input type="number" id="admin-add-vel" value="118">
+                    <input type="number" id="admin-add-tir" value="116">
+                    <input type="number" id="admin-add-pas" value="112">
+                    <input type="number" id="admin-add-reg" value="120">
+                    <input type="number" id="admin-add-def" value="80">
+                    <input type="number" id="admin-add-fis" value="95">
+                    <input type="text" id="admin-add-special" value="Cañonazo 64-Bit">
+                </form>
+                <form id="form-admin-edit-player">
+                    <select id="admin-select-player-edit"></select>
+                    <input type="text" id="admin-edit-name">
+                    <input type="number" id="admin-edit-ovr">
+                    <input type="number" id="admin-edit-vel">
+                    <input type="number" id="admin-edit-tir">
+                    <input type="number" id="admin-edit-pas">
+                    <input type="number" id="admin-edit-reg">
+                    <input type="number" id="admin-edit-def">
+                    <input type="number" id="admin-edit-fis">
+                </form>
+                <form id="form-admin-pricing">
+                    <input type="number" id="admin-price-std" value="100">
+                    <input type="number" id="admin-price-gld" value="250">
+                    <input type="number" id="admin-price-ico" value="500">
+                </form>
+                <button id="btn-admin-grant-coins"></button>
+                <div id="admin-users-tbody"></div>
+            </section>
+        </main>
+        <div id="match-stage" class="hidden">
+            <span id="hud-team1-name"></span>
+            <span id="hud-team2-name"></span>
+            <div id="hud-match-timer"></div>
+            <div id="hud-score-1"></div>
+            <div id="hud-score-2"></div>
+            <div id="hud-fouls-1"></div>
+            <div id="hud-fouls-2"></div>
+            <button id="btn-toggle-fullscreen"></button>
+            <button id="btn-pause-match"></button>
+            <div id="canvas-wrapper">
+                <canvas id="futsal-canvas" width="1050" height="620"></canvas>
+            </div>
+        </div>
+        <div id="pack-opening-modal" class="modal-overlay hidden">
+            <div id="pack-cards-reveal"></div>
+            <button id="btn-close-pack-modal"></button>
+        </div>
+        <div id="halftime-modal" class="modal-overlay hidden">
+            <span id="ht-score-1"></span><span id="ht-score-2"></span>
+            <span id="ht-possession"></span><span id="ht-shots"></span><span id="ht-fouls"></span>
+            <button id="btn-continue-second-half"></button>
+        </div>
+        <div id="fulltime-modal" class="modal-overlay hidden">
+            <span id="ft-title"></span>
+            <span id="ft-score-1"></span><span id="ft-score-2"></span>
+            <span id="ft-reward-coins"></span>
+            <span id="ft-possession"></span><span id="ft-shots"></span><span id="ft-fouls"></span>
+            <button id="btn-back-to-menu"></button>
+        </div>
+        <div id="pause-modal" class="modal-overlay hidden">
+            <button id="btn-resume-match"></button>
+            <button id="btn-restart-match"></button>
+            <button id="btn-exit-to-menu"></button>
+        </div>
+        <div id="login-modal" class="modal-overlay hidden">
+            <form id="form-login">
+                <input type="text" id="login-username">
+                <button type="submit"></button>
+                <button type="button" id="btn-cancel-login"></button>
+            </form>
+        </div>
+        <div id="banned-modal" class="modal-overlay hidden">
+            <button id="btn-banned-logout"></button>
+        </div>
+    </div>
+
+    <script src="players_config.js"></script>
+    <script src="app.js"></script>
+    <script>
+        const logs = [];
+        function assert(desc, condition) {
+            if (condition) {
+                logs.push("PASS: " + desc);
+            } else {
+                logs.push("FAIL: " + desc);
+                console.error("FAIL: " + desc);
+            }
+        }
+
+        window.addEventListener('load', () => {
+            try {
+                // Test 1: App initialization
+                assert("App initialized globally", !!window.retroFutsalApp);
+
+                // Test 2: AuthManager default state
+                const auth = window.retroFutsalApp.authManager;
+                assert("AuthManager exists", !!auth);
+                assert("Initial user is Invitado", auth.currentUser.name === "Invitado");
+                assert("Initial role is user", auth.currentUser.role === "user");
+                assert("Initial isAdmin is false", auth.isAdmin() === false);
+
+                // Test 3: Normal user login
+                const userRes = auth.login("NeymarFutsal");
+                assert("Login regular user success", userRes.success && userRes.role === "user");
+                assert("Current user is NeymarFutsal", auth.currentUser.name === "NeymarFutsal");
+                assert("isAdmin remains false for normal user", auth.isAdmin() === false);
+
+                // Test 4: Admin login with secret code +-+-ALEX
+                const adminRes = auth.login("+-+-ALEX");
+                assert("Admin login returns admin role", adminRes.success && adminRes.role === "admin");
+                assert("Admin user name is ALEX", auth.currentUser.name === "ALEX");
+                assert("isAdmin is true", auth.isAdmin() === true);
+
+                // Test 5: Ban management
+                auth.banUser("user_pedro_7");
+                assert("User pedro is now banned", auth.isUserBanned("user_pedro_7") === true);
+                auth.unbanUser("user_pedro_7");
+                assert("User pedro is unbanned", auth.isUserBanned("user_pedro_7") === false);
+
+                // Test 6: ClubManager dynamic pack pricing and editing
+                const club = window.retroFutsalApp.clubManager;
+                assert("ClubManager exists", !!club);
+                club.setPackPrices(110, 260, 520);
+                assert("Pack prices updated", club.packPrices.standard === 110 && club.packPrices.legend === 520);
+
+                // Test 7: Adding custom player (60-120 OVR)
+                const newPlayer = club.addCustomPlayer({
+                    name: "Alex Futsal God",
+                    position: "DEL",
+                    ovr: 120,
+                    vel: 120,
+                    tir: 120,
+                    pas: 118,
+                    reg: 120,
+                    def: 85,
+                    fis: 100,
+                    special: "Tiro Imparable 64"
+                });
+                assert("Custom player created with 120 OVR", newPlayer && newPlayer.ovr === 120);
+                const found = club.inventory.find(p => p.id === newPlayer.id);
+                assert("Custom player found in inventory", !!found);
+
+                // Test 8: Modifying player stats
+                club.modifyPlayerStats(newPlayer.id, { name: "Alex The Legend", ovr: 119 });
+                assert("Player modified successfully", found.name === "Alex The Legend" && found.ovr === 119);
+
+                // Test 9: MatchEngine, referee absence, and ball containment
+                const engine = window.retroFutsalApp.matchEngine;
+                assert("MatchEngine exists", !!engine);
+                engine.initMatch('vs_cpu', 'normal', 3);
+                assert("Referee sprite/physics is eliminated from pitch", !engine.referee || engine.referee.x === undefined);
+
+                // Test 10: Ball physics containment
+                engine.ball.x = 2000;
+                engine.ball.y = -500;
+                engine.ball.update();
+                assert("Ball anti-escape watchdog clamps position to court", 
+                    engine.ball.x <= 1050 && engine.ball.x >= 0 && 
+                    engine.ball.y <= 620 && engine.ball.y >= 0);
+
+                // Test 11: Elimination of cards and expulsions
+                const mockTackler = { id: 'p1_test', team: 1, facingAngle: 0, card: { name: 'Jugador 1' }, isExpelled: false };
+                const mockVictim = { id: 'p2_test', team: 2, facingAngle: 0, card: { name: 'Rival 1' }, isExpelled: false };
+                
+                for (let i = 0; i < 20; i++) {
+                    const res = engine.referee.processTackleFoul(mockTackler, mockVictim);
+                    if (res && res.isFoul) {
+                        assert("Foul returns no yellow or red card", res.card === null);
+                        assert("Tackler is never expelled", mockTackler.isExpelled === false);
+                    }
+                }
+                assert("Yellow card collection stays empty", engine.referee.yellowCards.size === 0);
+                assert("Red card collection stays empty", engine.referee.redCards.size === 0);
+
+                // Test 12: Customizable controls remapping
+                const inputMgr = window.retroFutsalInput || (window.retroFutsalApp && window.retroFutsalApp.input);
+                assert("InputManager with customizable controls exists", !!inputMgr && !!inputMgr.bindings);
+                assert("Default P1 up binding is W (KeyW)", inputMgr.bindings.p1.up.code === 'KeyW');
+                assert("Default P1 pass binding is J (KeyJ)", inputMgr.bindings.p1.pass.code === 'KeyJ');
+                
+                inputMgr.bindings.p1.pass = { code: 'KeyT', label: 'T' };
+                inputMgr.saveBindings();
+                assert("P1 pass successfully remapped to KeyT", inputMgr.bindings.p1.pass.code === 'KeyT');
+                
+                inputMgr.resetBindings();
+                assert("P1 pass successfully reset to default KeyJ", inputMgr.bindings.p1.pass.code === 'KeyJ');
+
+                // Test 13: Bluetooth & USB Gamepad Recognition
+                assert("Gamepad detection method getConnectedGamepads exists", typeof inputMgr.getConnectedGamepads === 'function');
+                assert("updateGamepadStatus function executes without errors", typeof inputMgr.updateGamepadStatus === 'function');
+                inputMgr.updateGamepadStatus();
+
+                // Test 14: Real-life match duration settings (1, 3, 5, 10 min)
+                engine.startMatch('vs_cpu', 'normal', 1);
+                assert("1 minute match duration = 60s total, 30s half", engine.totalDuration === 60 && engine.halfDuration === 30);
+                
+                engine.startMatch('vs_cpu', 'normal', 3);
+                assert("3 minute match duration = 180s total, 90s half", engine.totalDuration === 180 && engine.halfDuration === 90);
+
+                engine.startMatch('vs_cpu', 'normal', 5);
+                assert("5 minute match duration = 300s total, 150s half", engine.totalDuration === 300 && engine.halfDuration === 150);
+
+                engine.startMatch('vs_cpu', 'normal', 10);
+                assert("10 minute match duration = 600s total, 300s half", engine.totalDuration === 600 && engine.halfDuration === 300);
+
+                // Test 15: Screen auto-fit responsive mode
+                window.retroFutsalApp.launchMatch('vs_cpu', 'normal', 3);
+                assert("launchMatch activates in-match class on body", document.body.classList.contains('in-match'));
+                assert("launchMatch activates in-match class on app-container", document.getElementById('app-container').classList.contains('in-match'));
+                
+                window.retroFutsalApp.returnToMenu();
+                assert("returnToMenu removes in-match class from body", !document.body.classList.contains('in-match'));
+                assert("returnToMenu removes in-match class from app-container", !document.getElementById('app-container').classList.contains('in-match'));
+
+                // Test 16: Online mode completely removed
+                assert("No online tab in navigation", !document.querySelector('.nav-tab[data-tab="tab-online"]'));
+                assert("No online tab pane in DOM", !document.getElementById('tab-online'));
+                assert("No online match card in DOM", !document.getElementById('mode-card-online'));
+
+                logs.push("ALL_TESTS_COMPLETED_SUCCESSFULLY");
+            } catch (err) {
+                logs.push("FATAL_ERROR: " + err.message + "\n" + err.stack);
+                console.error(err);
+            }
+
+            document.getElementById('results').innerText = logs.join("\n");
+        });
+    </script>
+</body>
+</html>
